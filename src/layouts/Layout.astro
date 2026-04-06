@@ -1,7 +1,7 @@
 ---
 // src/layouts/Layout.astro
 const { title } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, ''); // Limpiamos la barra final si existe
 ---
 <html lang="es">
     <head>
@@ -9,46 +9,45 @@ const base = import.meta.env.BASE_URL;
         <meta name="viewport" content="width=device-width" />
         <title>{title}</title>
         
-        {/* Usamos define:vars para pasar la ruta base al CSS */}
         <style is:global define:vars={{ base }}>
             /* El peso más grueso para el LOGO y títulos */
             @font-face {
-            font-family: 'TX-02';
-            /* Concatenamos la base con la ruta de la fuente */
-            src: url(join(var(--base), '/fonts/tx02/TX-02-Black.otf')) format('opentype');
-            font-weight: 900;
-            font-style: normal;
-            font-display: swap;
+                font-family: 'TX-02';
+                /* Usamos la variable de CSS --base directamente concatenada */
+                src: url(var(--base) "/fonts/tx02/TX-02-Black.otf") format('opentype');
+                font-weight: 900;
+                font-style: normal;
+                font-display: swap;
             }
 
             /* El peso medio para botones y fechas */
             @font-face {
-            font-family: 'TX-02';
-            src: url(join(var(--base), '/fonts/tx02/TX-02-Medium.otf')) format('opentype');
-            font-weight: 500;
-            font-style: normal;
-            font-display: swap;
+                font-family: 'TX-02';
+                src: url(var(--base) "/fonts/tx02/TX-02-Medium.otf") format('opentype');
+                font-weight: 500;
+                font-style: normal;
+                font-display: swap;
             }
 
             /* El peso regular para la lectura general */
             @font-face {
-            font-family: 'TX-02';
-            src: url(join(var(--base), '/fonts/tx02/TX-02-Regular.otf')) format('opentype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
+                font-family: 'TX-02';
+                src: url(var(--base) "/fonts/tx02/TX-02-Regular.otf") format('opentype');
+                font-weight: 400;
+                font-style: normal;
+                font-display: swap;
             }
 
             /* El peso más delgado para bios o detalles minimalistas */
             @font-face {
-            font-family: 'TX-02';
-            src: url(join(var(--base), '/fonts/tx02/TX-02-Thin.otf')) format('opentype');
-            font-weight: 100;
-            font-style: normal;
-            font-display: swap;
+                font-family: 'TX-02';
+                src: url(var(--base) "/fonts/tx02/TX-02-Thin.otf") format('opentype');
+                font-weight: 100;
+                font-style: normal;
+                font-display: swap;
             }
             
-            /* El botón ahora es horizontal para contener las barras verticales */
+            /* --- El resto de tu CSS se mantiene exactamente igual --- */
             .menu-trigger {
                 background: none;
                 border: none;
