@@ -1,0 +1,55 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+// 1. Generar las rutas para cada archivo Markdown
+export async function getStaticPaths() {
+  const proyectos = await getCollection('animaciones');
+  return proyectos.map(proyecto => ({
+    params: { id: proyecto.id },
+    props: { proyecto },
+  }));
+}
+
+// 2. Obtener la data del proyecto
+const { proyecto } = Astro.props;
+const { Content } = await render(proyecto);
+---
+
+<Layout title={`${proyecto.data.title} | Knee Guard Studios`}>
+  <nav style="margin-bottom: 2rem;">
+    <a href="/" style="color: var(--muted); font-size: 0.9rem;">← Volver al inicio</a>
+  </nav>
+
+  <article>
+    <header style="margin-bottom: 2rem;">
+      <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">{proyecto.data.title}</h1>
+      <p style="color: var(--muted); font-family: monospace;">
+        {proyecto.data.pubDate.toLocaleDateString('es-CL')}
+      </p>
+    </header>
+
+    <div style="aspect-ratio: 16 / 9; background: #000; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; color: white;">
+      {proyecto.data.videoUrl.includes('youtube.com') || proyecto.data.videoUrl.includes('youtu.be') ? (
+        <iframe 
+          width="100%" 
+          height="100%" 
+          src={proyecto.data.videoUrl.replace("watch?v=", "embed/")} 
+          frameborder="0" 
+          allowfullscreen
+        ></iframe>
+      ) : (
+        <p>Link de video: <a href={proyecto.data.videoUrl} target="_blank" style="color: var(--accent);">{proyecto.data.videoUrl}</a></p>
+      )}
+    </div>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .prose :global(p) { margin-bottom: 1.5rem; }
+  .prose :global(h2) { margin-top: 2rem; color: var(--fg); }
+</style>

@@ -1,0 +1,141 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const proyectos = await getCollection('animaciones');
+const proyectosOrdenados = proyectos.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<Layout title="Knee Guard Studios">
+    <header style="margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: baseline;">
+        <div>
+            <h1 style="font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin: 0; font-family: 'TX-02', monospace;">
+                KNEE GUARD <span style="color: var(--accent);">STUDIOS</span>
+            </h1>
+            <p style="color: var(--muted); font-family: 'TX-02', monospace; font-weight: 100; margin: 0;">[ Minimalist Animation Collective ]</p>
+        </div>
+
+        <div class="nav-wrapper">
+            <button id="menu-btn" aria-label="Abrir menú" class="menu-trigger">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </button>
+
+            <nav id="menu-dropdown" class="menu-content">
+                <a href="/about">ABOUT</a>
+                <a href="/archive">PROJECTS</a>
+                <a href="mailto:contact@kneeguard.com">CONTACT</a>
+            </nav>
+        </div>
+    </header>
+
+    <style is:global>
+        .nav-wrapper { position: relative; }
+
+        /* TRIGGER: Inicia vertical ||| */
+        .menu-trigger {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: row; /* Barras una al lado de la otra */
+            gap: 5px;
+            padding: 10px;
+            /* Suavizamos el giro */
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .bar {
+            width: 3px;
+            height: 22px;
+            background-color: var(--fg);
+            transition: background-color 0.3s;
+        }
+
+        /* GIRO A HORIZONTAL ≡ */
+        .menu-trigger.active {
+            transform: rotate(90deg);
+        }
+
+        .menu-content {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--bg);
+            border: 1px solid var(--fg);
+            display: flex; 
+            flex-direction: column;
+            min-width: 160px;
+            z-index: 100;
+            margin-top: 10px;
+
+            /* Fade + Slide */
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none; 
+            transition: 
+                opacity 0.3s ease, 
+                transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .menu-content.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .menu-content a {
+            padding: 1rem 1.2rem;
+            font-size: 0.8rem;
+            font-family: 'TX-02', monospace;
+            font-weight: 500;
+            text-align: right;
+            text-decoration: none;
+            color: var(--fg);
+        }
+
+        .menu-content a:hover {
+            background-color: var(--fg);
+            color: var(--bg);
+        }
+    </style>
+
+    <script>
+        const btn = document.getElementById('menu-btn');
+        const menu = document.getElementById('menu-dropdown');
+
+        btn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Toggles para activar giro y mostrar menú
+            btn.classList.toggle('active');
+            menu?.classList.toggle('show');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!btn?.contains(e.target as Node) && !menu?.contains(e.target as Node)) {
+                btn?.classList.remove('active');
+                menu?.classList.remove('show');
+            }
+        });
+    </script>
+
+    <section>
+        <h2 style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; color: var(--muted); font-family: 'TX-02', monospace;">Proyectos Recientes</h2>
+        <div style="margin-top: 2rem;">
+            {proyectosOrdenados.map(proyecto => (
+                <article style="border-bottom: 1px solid rgba(0,0,0,0.1); padding: 1.5rem 0; display: flex; justify-content: space-between; align-items: baseline;">
+                    <div>
+                        <h3 style="margin: 0; font-weight: 700; font-family: 'TX-02', monospace;">
+                            <a href={`/animaciones/${proyecto.id}`} style="text-decoration: none; color: var(--fg);">{proyecto.data.title}</a>
+                        </h3>
+                        <p style="margin: 0.5rem 0 0; color: var(--muted); font-size: 0.9rem; font-family: 'TX-02', monospace; font-weight: 300;">{proyecto.data.description}</p>
+                    </div>
+                    <span style="font-family: 'TX-02', monospace; font-size: 0.8rem; color: var(--muted); font-weight: 400;">
+                        {proyecto.data.pubDate.toLocaleDateString('es-CL', { year: 'numeric', month: 'short', day: '2-digit' })}
+                    </span>
+                </article>
+            ))}
+        </div>
+    </section>
+</Layout>

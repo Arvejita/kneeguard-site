@@ -1,0 +1,147 @@
+---
+// src/layouts/Layout.astro
+const { title } = Astro.props;
+---
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>{title}</title>
+		<style is:global>
+            /* El peso más grueso para el LOGO y títulos */
+            @font-face {
+            font-family: 'TX-02';
+            src: url('/fonts/tx02/TX-02-Black.otf') format('opentype');
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
+            }
+
+            /* El peso medio para botones y fechas */
+            @font-face {
+            font-family: 'TX-02';
+            src: url('/fonts/tx02/TX-02-Medium.otf') format('opentype');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+            }
+
+            /* El peso regular para la lectura general */
+            @font-face {
+            font-family: 'TX-02';
+            src: url('/fonts/tx02/TX-02-Regular.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+            }
+
+            /* El peso más delgado para bios o detalles minimalistas */
+            @font-face {
+            font-family: 'TX-02';
+            src: url('/fonts/tx02/TX-02-Thin.otf') format('opentype');
+            font-weight: 100;
+            font-style: normal;
+            font-display: swap;
+            }
+            /* El botón ahora es horizontal para contener las barras verticales */
+            .menu-trigger {
+                background: none;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                flex-direction: row; /* Cambiado a row para que las barras estén una al lado de otra */
+                gap: 4px;
+                padding: 10px;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 100;
+            }
+
+            /* Las barritas ahora son altas y delgadas (verticales) */
+            .bar {
+                width: 2px;  /* Antes era el alto, ahora es el ancho */
+                height: 20px; /* Antes era el ancho, ahora es el alto */
+                background-color: var(--fg);
+                transition: 0.3s;
+            }
+
+            /* Giro de 90 grados: Al rotar, lo que era vertical se vuelve horizontal */
+            .menu-trigger.active {
+                transform: rotate(90deg);
+            }
+			:root {
+                /* Un off-white más cálido y cremoso */
+                --bg: #F2EFE9; 
+                --fg: #2D2A26;
+                --muted: #78716C; /* Un gris con un toque café para armonizar */
+                --accent: #FF4F00;
+            }
+            
+            /* Estilo para las fotos de los miembros */
+            .member-avatar {
+                width: 80px;
+                height: 80px;
+                background-color: var(--fg);
+                border-radius: 50%; /* O déjalo cuadrado para más minimalismo */
+                filter: grayscale(100%);
+                transition: filter 0.3s ease;
+            }
+            .member-avatar:hover {
+                filter: grayscale(0%);
+            }
+			body {
+				background: var(--bg);
+				color: var(--fg);
+				font-family: 'TX-02', monospace;
+                -webkit-font-smoothing: antialiased;
+                font-weight: 400;
+				margin: 0;
+				padding: 2rem;
+				line-height: 1.6;
+			}
+			a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--accent); }
+			.container { max-width: 700px; margin: 0 auto; }
+
+            /* Agrega esto dentro del <style is:global> en Layout.astro */
+            html {
+                scroll-behavior: smooth;
+                /* Suavizado de fuente estilo MacOS/Linux premium */
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            ::selection {
+                background-color: var(--accent);
+                color: white;
+            }
+
+            /* Scrollbar minimalista */
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+            ::-webkit-scrollbar-track {
+                background: var(--bg);
+            }
+            ::-webkit-scrollbar-thumb {
+                background: var(--muted);
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-weight: 900; /* Peso Black para el impacto de Knee Guard */
+                text-transform: uppercase;
+                letter-spacing: -0.04em;
+                margin: 0;
+            }
+            .timestamp {
+                font-weight: 500; /* Peso Medium */
+                font-size: 0.85rem;
+                color: var(--muted);
+            }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<slot />
+		</div>
+	</body>
+</html>
