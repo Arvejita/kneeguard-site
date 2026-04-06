@@ -1,31 +1,31 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
+const base = import.meta.env.BASE_URL;
 const equipo = [
   {
     nombre: "Martin",
     rol: "Director de Animación / Lead In-betweener",
     bio: "Especialista en fluidez analógica y sistemas de producción indie.",
-    foto: "/images/team/martin.jpg" 
+    foto: "/kneeguard-site/images/team/martin.jpg" 
   },
   {
     nombre: "Remato", 
     rol: "Key-framer Digital",
     bio: "Encargado de la estructura y el timing digital de las piezas.",
-    foto: "/images/team/remato.jpg"
+    foto: "/kneeguard-site/images/team/remato.jpg"
   },
   {
     nombre: "Eker da goat",
     rol: "Main-animator",
     bio: "Encargado de la estructura y el timing digital de las piezas.",
-    foto: "/images/team/eker.jpg" 
+    foto: "/kneeguard-site/images/team/eker.jpg" 
   }
 ];
 ---
 
 <Layout title="Sobre Nosotros | Knee Guard Studios">
   <nav style="margin-bottom: 3rem;">
-    <a href="/" class="nav-back">← INICIO</a>
+    <a href={base} class="nav-back">← INICIO</a>
   </nav>
 
   <section>

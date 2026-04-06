@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-
+const base = import.meta.env.BASE_URL;
 const proyectos = await getCollection('animaciones');
 const proyectosOrdenados = proyectos.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
@@ -23,9 +23,9 @@ const proyectosOrdenados = proyectos.sort((a, b) => b.data.pubDate.valueOf() - a
             </button>
 
             <nav id="menu-dropdown" class="menu-content">
-                <a href="/about">ABOUT</a>
-                <a href="/archive">PROJECTS</a>
-                <a href="mailto:contact@kneeguard.com">CONTACT</a>
+                <a href={`${base}/about`}>ABOUT</a>
+                <a href={`${base}/archive`}PROJECTS</a>
+                <a href="mailto:contact@kneeguard.pics">CONTACT</a>
             </nav>
         </div>
     </header>
