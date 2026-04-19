@@ -2,6 +2,7 @@
 title: "Nuevo proyecto super bacan"
 pubDate: 2026-04-19T19:46:00-04:00 
 description: "segundo post EVER!!!"
+videoUrl: "https://www.youtube.com/watch?v=J3Bkd_XFJzY"
 tags: ["2D", "Indie", "Skibiid"]
 ---
 
