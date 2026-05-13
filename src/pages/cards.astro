@@ -169,61 +169,66 @@ const misCartas = [
   cards.forEach(card => {
     const content = card.querySelector('.card__content') as HTMLElement;
 
-    card.addEventListener('mousemove', (e: MouseEvent) => {
-      // Si la carta ya está activa, no queremos que el movimiento 
-      // del mouse pelee con la animación de entrada
-      if (card.classList.contains('is-active')) {
-        const rect = card.getBoundingClientRect();
-        const xPerc = ((e.clientX - rect.left) / rect.width) * 100;
-        const yPerc = ((e.clientY - rect.top) / rect.height) * 100;
-        
-        card.style.setProperty('--x', `${xPerc}%`);
-        card.style.setProperty('--y', `${yPerc}%`);
-        
-        const rX = (yPerc - 50) / -5;
-        const rY = (xPerc - 50) / 5;
-        // Mantenemos el centrado fijo mientras rotamos
-        card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.4)`;
-        return;
-      }
-
-      // Comportamiento normal en la grilla
+    // Función unificada para calcular la rotación
+    const handleMove = (clientX: number, clientY: number) => {
       const rect = card.getBoundingClientRect();
-      const xPerc = ((e.clientX - rect.left) / rect.width) * 100;
-      const yPerc = ((e.clientY - rect.top) / rect.height) * 100;
+      const xPerc = ((clientX - rect.left) / rect.width) * 100;
+      const yPerc = ((clientY - rect.top) / rect.height) * 100;
 
       card.style.setProperty('--x', `${xPerc}%`);
       card.style.setProperty('--y', `${yPerc}%`);
 
-      const rX = (yPerc - 50) / -7;
-      const rY = (xPerc - 50) / 7;
+      if (card.classList.contains('is-active')) {
+        const rX = (yPerc - 50) / -5;
+        const rY = (xPerc - 50) / 5;
+        card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.4)`;
+      } else {
+        const rX = (yPerc - 50) / -7;
+        const rY = (xPerc - 50) / 7;
+        content.style.transform = `perspective(1000px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.05)`;
+      }
+    };
 
-      content.style.transform = `perspective(1000px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.05)`;
+    // --- EVENTOS DE MOUSE ---
+    card.addEventListener('mousemove', (e: MouseEvent) => {
+      handleMove(e.clientX, e.clientY);
     });
+
+    // --- EVENTOS DE TOUCH (Mobile Drag) ---
+    card.addEventListener('touchmove', (e: TouchEvent) => {
+      // Evita que la página haga scroll mientras mueves la carta
+      if (card.classList.contains('is-active')) {
+        e.preventDefault();
+      }
+      const touch = e.touches[0];
+      handleMove(touch.clientX, touch.clientY);
+    }, { passive: false });
 
     card.addEventListener('mouseleave', () => {
       if (card.classList.contains('is-active')) {
-        // Regresa suavemente al centro sin rotación en modo zoom
         card.classList.add('smooth-return');
         card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.4)`;
-        
-        // Quitamos la clase después de la animación para que no interfiera con el mousemove
         setTimeout(() => card.classList.remove('smooth-return'), 600);
       } else {
-        // Comportamiento normal en la grilla
         content.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
       }
     });
 
+    // Resetear al soltar el dedo en mobile
+    card.addEventListener('touchend', () => {
+        if (card.classList.contains('is-active')) {
+            card.classList.add('smooth-return');
+            card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.4)`;
+            setTimeout(() => card.classList.remove('smooth-return'), 600);
+        } else {
+            content.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
+        }
+    });
+
     card.addEventListener('click', (e) => {
-      // Evitamos que el click se propague al overlay si hacemos click en la carta
       e.stopPropagation();
-      
-      // Si la carta YA está activa, no hacemos nada al hacerle click 
-      // (así permitimos que el usuario interactúe con ella sin que se cierre)
       if (card.classList.contains('is-active')) return;
 
-      // ABRIR (Solo si no está activa)
       content.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
       
       requestAnimationFrame(() => {
@@ -235,26 +240,16 @@ const misCartas = [
     });
   });
 
-  // Salir del modo zoom haciendo click afuera (en el overlay)
   overlay?.addEventListener('click', () => {
-    const activeCard = document.querySelector('.card.is-active') as HTMLElement;
-    if (activeCard) {
-      const activeContent = activeCard.querySelector('.card__content') as HTMLElement;
-      
-      // Aplicamos la animación de regreso
-      activeCard.classList.add('smooth-return');
-      activeCard.classList.remove('is-active');
-      activeCard.style.transform = ''; // Vuelve a su posición en el grid
-      
-      // Reseteamos el contenido interno
-      activeContent.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-      
-      // Quitamos overlay y scroll lock
+    const active = document.querySelector('.card.is-active') as HTMLElement;
+    if (active) {
+      active.classList.add('smooth-return');
+      active.classList.remove('is-active');
+      active.style.transform = '';
+      (active.querySelector('.card__content') as HTMLElement).style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
       overlay.classList.remove('active');
       document.body.style.overflow = 'auto';
-
-      // Limpiamos la clase de transición después de que termine
-      setTimeout(() => activeCard.classList.remove('smooth-return'), 600);
+      setTimeout(() => active.classList.remove('smooth-return'), 600);
     }
   });
 </script>
