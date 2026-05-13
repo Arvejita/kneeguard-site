@@ -1,0 +1,256 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Aquí defines la información de tus cartas
+const misCartas = [
+  { nombre: "Pieza 01", rarity: "basic", imagen: "/images/cards/1-999-tocolas.png" },
+  { nombre: "Pieza 02", rarity: "basic", imagen: "/images/cards/2-999-damian.png" },
+  { nombre: "Pieza 03", rarity: "basic", imagen: "/images/cards/3-999-renato-confinado.png" },
+  { nombre: "Pieza 04", rarity: "basic", imagen: "/images/cards/4-999-remato.png" },
+  { nombre: "Pieza 05", rarity: "rare holo", imagen: "/images/cards/5-999-luer.png" },
+  { nombre: "Pieza 06", rarity: "basic", imagen: "/images/cards/6-999-cleme.png" },
+  { nombre: "Pieza 07", rarity: "basic", imagen: "/images/cards/7-999-clemente.png" },
+  { nombre: "Pieza 08", rarity: "rare holo", imagen: "/images/cards/8-999-zesty-ruz.png" },
+  { nombre: "Pieza 09", rarity: "basic", imagen: "/images/cards/9-999-fernando.png" },
+  { nombre: "Pieza 10", rarity: "basic", imagen: "/images/cards/10-999-samira.png" },
+  { nombre: "Pieza 11", rarity: "basic", imagen: "/images/cards/11-999-amistad.png" },
+];
+---
+
+<Layout title="Cartas | Knee Guard Studios">
+  <nav style="margin-bottom: 3rem;">
+    <a href="/" class="nav-back">← INICIO</a>
+  </nav>
+
+  <header>
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem; font-family: 'TX-02', monospace; font-weight: 900;">Colección G25</h1>
+    <p style="font-size: 1.1rem; max-width: 60ch; margin-bottom: 4rem; font-family: 'TX-02', monospace; font-weight: 300; color: var(--muted);">
+      Explora nuestra coleccion de TCG de la G25
+    </p>
+  </header>
+
+  <main class="gallery-container">
+  <div class="cards-grid">
+    {misCartas.map((carta) => (
+      <div class="card" data-rarity={carta.rarity}>
+        <div class="card__content">
+          <img src={carta.imagen} alt={carta.nombre} />
+          <div class="card__shimmer"></div>
+          <div class="card__glare"></div>
+        </div>
+      </div>
+    ))}
+  </div>
+  <div id="cardOverlay" class="overlay"></div>
+  </main>
+</Layout>
+
+<style is:global>
+  /* 1. ESTRUCTURA DE LA GRILLA */
+  .gallery-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .cards-grid {
+    display: grid;
+    /* Forzamos 3 columnas de 300px */
+    grid-template-columns: repeat(3, 300px);
+    gap: 40px;
+    /* Esto evita que se apilen una encima de otra */
+    position: relative; 
+  }
+
+  /* 2. LA CARTA */
+  .card {
+    width: 300px;
+    aspect-ratio: 5/7;
+    position: relative;
+    perspective: 1000px; /* Necesario para el efecto 3D */
+  }
+
+  .card__content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #111;
+    transform-style: preserve-3d;
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+  }
+
+  .card__content img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  /* 3. EFECTOS (HOLO Y GLARE) */
+  .card__shimmer, .card__glare {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Holo Tornasol Potenciado */
+  .card__shimmer {
+    z-index: 2;
+    background: linear-gradient(
+      110deg,
+      transparent 15%,
+      rgba(255, 0, 0, 0.15) 25%,
+      rgba(0, 255, 0, 0.15) 45%,
+      rgba(0, 0, 255, 0.15) 65%,
+      transparent 85%
+    );
+    background-size: 150% 150%;
+    background-position: var(--x, 50%) var(--y, 50%);
+    mix-blend-mode: color-dodge;
+    filter: brightness(1.2) contrast(1.2);
+  }
+
+  /* Glare Suave */
+  .card__glare {
+    z-index: 3;
+    background: radial-gradient(
+      circle at var(--x, 50%) var(--y, 50%),
+      rgba(255, 255, 255, 0.15) 0%,
+      transparent 75%
+    );
+  }
+
+  /* Mostrar efectos al hacer hover */
+  .card:hover .card__glare { opacity: 1; }
+  .card[data-rarity*="holo"]:hover .card__shimmer { opacity: 1; }
+
+  /* 4. ZOOM Y OVERLAY */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 9000;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.4s;
+  }
+  .overlay.active { opacity: 1; visibility: visible; }
+
+  .card.is-active {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 10000;
+    width: 400px;
+    margin: 0;
+  }
+
+  .card.smooth-return {
+    /* El cubic-bezier es clave para que se sienta orgánico */
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  }
+
+  /* 5. RESPONSIVE */
+  @media (max-width: 1050px) { .cards-grid { grid-template-columns: repeat(2, 300px); } }
+  @media (max-width: 700px) { .cards-grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  const cards = document.querySelectorAll<HTMLElement>('.card');
+  const overlay = document.getElementById('cardOverlay');
+
+  cards.forEach(card => {
+    const content = card.querySelector('.card__content') as HTMLElement;
+
+    card.addEventListener('mousemove', (e: MouseEvent) => {
+      // Si la carta ya está activa, no queremos que el movimiento 
+      // del mouse pelee con la animación de entrada
+      if (card.classList.contains('is-active')) {
+        const rect = card.getBoundingClientRect();
+        const xPerc = ((e.clientX - rect.left) / rect.width) * 100;
+        const yPerc = ((e.clientY - rect.top) / rect.height) * 100;
+        
+        card.style.setProperty('--x', `${xPerc}%`);
+        card.style.setProperty('--y', `${yPerc}%`);
+        
+        const rX = (yPerc - 50) / -5;
+        const rY = (xPerc - 50) / 5;
+        // Mantenemos el centrado fijo mientras rotamos
+        card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.4)`;
+        return;
+      }
+
+      // Comportamiento normal en la grilla
+      const rect = card.getBoundingClientRect();
+      const xPerc = ((e.clientX - rect.left) / rect.width) * 100;
+      const yPerc = ((e.clientY - rect.top) / rect.height) * 100;
+
+      card.style.setProperty('--x', `${xPerc}%`);
+      card.style.setProperty('--y', `${yPerc}%`);
+
+      const rX = (yPerc - 50) / -7;
+      const rY = (xPerc - 50) / 7;
+
+      content.style.transform = `perspective(1000px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.05)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      if (card.classList.contains('is-active')) {
+        // Regresa suavemente al centro sin rotación en modo zoom
+        card.classList.add('smooth-return');
+        card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.4)`;
+        
+        // Quitamos la clase después de la animación para que no interfiera con el mousemove
+        setTimeout(() => card.classList.remove('smooth-return'), 600);
+      } else {
+        // Comportamiento normal en la grilla
+        content.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
+      }
+    });
+
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      if (card.classList.contains('is-active')) {
+        // CERRAR
+        card.classList.remove('is-active');
+        card.style.transform = '';
+        content.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        overlay?.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      } else {
+        // ABRIR
+        // 1. Primero reseteamos la rotación del contenido para que no vuele "doblada"
+        content.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        
+        // 2. Esperamos un micro-segundo para que el navegador registre el reset
+        // y luego disparamos el zoom centrado
+        requestAnimationFrame(() => {
+          card.classList.add('is-active');
+          overlay?.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.4)`;
+        });
+      }
+    });
+  });
+
+  overlay?.addEventListener('click', () => {
+    const active = document.querySelector('.card.is-active') as HTMLElement;
+    if (active) {
+      const content = active.querySelector('.card__content') as HTMLElement;
+      active.classList.remove('is-active');
+      active.style.transform = '';
+      content.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+      overlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+  });
+</script>
