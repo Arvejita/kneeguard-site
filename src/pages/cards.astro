@@ -216,41 +216,45 @@ const misCartas = [
     });
 
     card.addEventListener('click', (e) => {
+      // Evitamos que el click se propague al overlay si hacemos click en la carta
       e.stopPropagation();
       
-      if (card.classList.contains('is-active')) {
-        // CERRAR
-        card.classList.remove('is-active');
-        card.style.transform = '';
-        content.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-        overlay?.classList.remove('active');
-        document.body.style.overflow = 'auto';
-      } else {
-        // ABRIR
-        // 1. Primero reseteamos la rotación del contenido para que no vuele "doblada"
-        content.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-        
-        // 2. Esperamos un micro-segundo para que el navegador registre el reset
-        // y luego disparamos el zoom centrado
-        requestAnimationFrame(() => {
-          card.classList.add('is-active');
-          overlay?.classList.add('active');
-          document.body.style.overflow = 'hidden';
-          card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.4)`;
-        });
-      }
+      // Si la carta YA está activa, no hacemos nada al hacerle click 
+      // (así permitimos que el usuario interactúe con ella sin que se cierre)
+      if (card.classList.contains('is-active')) return;
+
+      // ABRIR (Solo si no está activa)
+      content.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+      
+      requestAnimationFrame(() => {
+        card.classList.add('is-active');
+        overlay?.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.4)`;
+      });
     });
   });
 
+  // Salir del modo zoom haciendo click afuera (en el overlay)
   overlay?.addEventListener('click', () => {
-    const active = document.querySelector('.card.is-active') as HTMLElement;
-    if (active) {
-      const content = active.querySelector('.card__content') as HTMLElement;
-      active.classList.remove('is-active');
-      active.style.transform = '';
-      content.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+    const activeCard = document.querySelector('.card.is-active') as HTMLElement;
+    if (activeCard) {
+      const activeContent = activeCard.querySelector('.card__content') as HTMLElement;
+      
+      // Aplicamos la animación de regreso
+      activeCard.classList.add('smooth-return');
+      activeCard.classList.remove('is-active');
+      activeCard.style.transform = ''; // Vuelve a su posición en el grid
+      
+      // Reseteamos el contenido interno
+      activeContent.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+      
+      // Quitamos overlay y scroll lock
       overlay.classList.remove('active');
       document.body.style.overflow = 'auto';
+
+      // Limpiamos la clase de transición después de que termine
+      setTimeout(() => activeCard.classList.remove('smooth-return'), 600);
     }
   });
 </script>
